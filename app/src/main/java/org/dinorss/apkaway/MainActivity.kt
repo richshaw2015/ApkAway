@@ -215,7 +215,7 @@ fun TopBanner(hasAllPermissions: Boolean = false) {
                 .padding(16.dp)
         )
         Column {
-            Text("卓安保･" + (if (hasAllPermissions) "守护中" else "服务未启动"), fontSize = 24.sp)
+            Text("小卓･" + (if (hasAllPermissions) "正在守护中" else "服务未启动"), fontSize = 24.sp)
             Text("自动拦截恶意安装包", fontSize = 18.sp, color = MaterialTheme.colors.onPrimary)
         }
     }

@@ -62,7 +62,7 @@ class ApkBlockerService : Service() {
             }
             val builder = NotificationCompat.Builder(this, "service_channel")
 
-            builder.setContentTitle(StringBuilder(resources.getString(R.string.app_name)).append("正在守护中").toString())
+            builder.setContentTitle(StringBuilder("小卓･正在守护中").toString())
                 .setSmallIcon(R.drawable.logo)
                 .setColorized(true)
                 .setColor(getColor(R.color.notification))
