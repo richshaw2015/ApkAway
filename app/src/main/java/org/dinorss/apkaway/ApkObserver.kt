@@ -66,7 +66,7 @@ class RecursiveApkObserver:
             // 只监控特定的文件夹，避免影响性能
             if (file.name.lowercase().contains("download")
                 || OBSERVER_EXT_LIST.contains(file.absolutePath)) {
-                // Log.d("", file.absolutePath)
+                Log.d("", file.absolutePath)
                 return true
             }
             return false

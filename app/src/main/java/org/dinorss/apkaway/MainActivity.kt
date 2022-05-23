@@ -25,6 +25,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,6 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import org.dinorss.apkaway.ui.theme.ApkAwayTheme
 
 
@@ -183,26 +188,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomePage(hasAllPermissions: Boolean = false, logs: List<String>) {
     Scaffold(
-        content = { Column() {
-            TopBanner(hasAllPermissions = hasAllPermissions)
-            MiddleDeclaration(hasAllPermissions = hasAllPermissions)
-            BottomLog(logs = logs)
-        } },
-//        bottomBar = {
-//            BottomAppBar(
-//                cutoutShape = MaterialTheme.shapes.small.copy(
-//                    CornerSize(percent = 50)
-//                ),
-//                backgroundColor = MaterialTheme.colors.secondary
-//            ) { }
-//        }
-//        floatingActionButtonPosition = FabPosition.Center,
-//        floatingActionButton = {
-//            FloatingActionButton(onClick = {}, backgroundColor = MaterialTheme.colors.primary) {
-//                Icon(Icons.Rounded.Refresh,"")
-//            }
-//        },
-//        isFloatingActionButtonDocked = true,
+        content = {
+            Column {
+                TopBanner(hasAllPermissions = hasAllPermissions)
+                MiddleDeclaration(hasAllPermissions = hasAllPermissions)
+                if (!hasAllPermissions) BottomLottie() else BottomLogs(logs = logs)
+            }
+        },
     )
 }
 
@@ -276,7 +268,7 @@ fun MiddleDeclaration(hasAllPermissions: Boolean = false) {
 }
 
 @Composable
-fun BottomLog(logs : List<String>) {
+fun BottomLogs(logs : List<String>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -290,5 +282,18 @@ fun BottomLog(logs : List<String>) {
                 color = MaterialTheme.colors.onBackground
             )
         }
+    }
+}
+
+@Composable
+fun BottomLottie() {
+    // TODO 这个状态可能导致问题
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.dog_lottie))
+
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .wrapContentSize(Alignment.Center)
+        .padding(horizontal = 64.dp)) {
+        LottieAnimation(composition, iterations = LottieConstants.IterateForever,)
     }
 }
