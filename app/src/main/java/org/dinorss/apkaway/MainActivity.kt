@@ -274,8 +274,17 @@ fun BottomLogs(logs : List<String>) {
             .fillMaxSize()
             .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())) {
-        logs.forEach { log ->
-            Text(log,
+        if (logs.isNotEmpty()) {
+            logs.forEach { log ->
+                Text(log,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    modifier = Modifier.padding(vertical = 6.dp),
+                    color = MaterialTheme.colors.onBackground
+                )
+            }
+        } else {
+            Text("⛔ 拦截日志将在这里显示",
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 modifier = Modifier.padding(vertical = 6.dp),
