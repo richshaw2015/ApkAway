@@ -29,6 +29,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -46,10 +47,10 @@ class MainActivity : ComponentActivity() {
         // 检查权限
         checkAllPermissions()
 
-        Log.d("", hasAllPermissions().toString())
-
-        // 启动服务
-        startService(Intent(this, ApkBlockerService::class.java))
+        if (hasAllPermissions()) {
+            // 启动服务
+            startService(Intent(this, ApkBlockerService::class.java))
+        }
     }
 
     private fun isServiceRunning(serviceClass: Class<*>): Boolean {
@@ -124,6 +125,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.i("PERM", "$requestCode")
+
+        // 权限更新
+        setContent {
+            ApkAwayTheme {
+                HomePage(hasAllPermissions = hasAllPermissions())
+            }
+        }
+        if (hasAllPermissions()) {
+            // 启动服务
+            startService(Intent(this, ApkBlockerService::class.java))
+        }
+    }
+
     companion object{
         const val  ACTION_STOP_FOREGROUND = "${BuildConfig.APPLICATION_ID}.stopforeground"
     }
@@ -133,7 +151,7 @@ class MainActivity : ComponentActivity() {
 fun HomePage(hasAllPermissions: Boolean = false) {
     Scaffold(
         content = { Column() {
-            TopBanner()
+            TopBanner(hasAllPermissions = hasAllPermissions)
             MiddleDeclaration(hasAllPermissions = hasAllPermissions)
             BottomLog()
         } },
@@ -156,18 +174,23 @@ fun HomePage(hasAllPermissions: Boolean = false) {
 }
 
 @Composable
-fun TopBanner() {
+fun TopBanner(hasAllPermissions: Boolean = false) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .background(MaterialTheme.colors.primary)
             .fillMaxWidth()) {
         Image(
-            painter = painterResource(R.drawable.ic_launcher_foreground),
+            painter = if (hasAllPermissions) painterResource(R.drawable.ic_logo) else painterResource(
+                R.drawable.ic_logo_grey
+            ),
             contentDescription = "Logo",
+            Modifier
+                .size(108.dp, 108.dp)
+                .padding(16.dp)
         )
         Column {
-            Text("卓安保", fontSize = 24.sp)
+            Text("卓安保･" + (if (hasAllPermissions) "守护中" else "服务未启动"), fontSize = 24.sp)
             Text("自动拦截恶意安装包", fontSize = 20.sp, color = MaterialTheme.colors.onPrimary)
         }
     }
@@ -184,6 +207,7 @@ fun MiddleDeclaration(hasAllPermissions: Boolean = false) {
             Text(
                 "❤️ 应用启动后会自动拦截恶意安装包，守护长者和孩童不受恶意应用骚扰",
                 fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
                 lineHeight = 28.sp,
                 modifier = Modifier.padding(vertical = 8.dp),
                 color = MaterialTheme.colors.onBackground
@@ -194,6 +218,7 @@ fun MiddleDeclaration(hasAllPermissions: Boolean = false) {
                 Text(
                     "⚠️ 请确保开启了应用的存储权限、开机启动权限、前台服务权限",
                     fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     lineHeight = 28.sp,
                     modifier = Modifier.padding(vertical = 8.dp),
                     color = MaterialTheme.colors.onBackground
@@ -204,6 +229,7 @@ fun MiddleDeclaration(hasAllPermissions: Boolean = false) {
                 Text(
                     "ℹ️️ 由于技术原因，Android 11 及以上版本拦截效果不佳，请了解",
                     fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     lineHeight = 28.sp,
                     modifier = Modifier.padding(vertical = 8.dp),
                     color = MaterialTheme.colors.onBackground
