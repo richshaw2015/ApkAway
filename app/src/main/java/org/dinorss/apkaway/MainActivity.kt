@@ -3,10 +3,6 @@ package org.dinorss.apkaway
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,8 +17,20 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Phone
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,13 +39,7 @@ class MainActivity : ComponentActivity() {
         // 界面逻辑
         setContent {
             ApkAwayTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
-                }
+                HomePage(hasAllPermissions = hasAllPermissions())
             }
         }
 
@@ -128,14 +130,120 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun HomePage(hasAllPermissions: Boolean = false) {
+    Scaffold(
+        content = { Column() {
+            TopBanner()
+            MiddleDeclaration(hasAllPermissions = hasAllPermissions)
+            BottomLog()
+        } },
+//        bottomBar = {
+//            BottomAppBar(
+//                cutoutShape = MaterialTheme.shapes.small.copy(
+//                    CornerSize(percent = 50)
+//                ),
+//                backgroundColor = MaterialTheme.colors.secondary
+//            ) { }
+//        }
+//        floatingActionButtonPosition = FabPosition.Center,
+//        floatingActionButton = {
+//            FloatingActionButton(onClick = {}, backgroundColor = MaterialTheme.colors.primary) {
+//                Icon(Icons.Rounded.Refresh,"")
+//            }
+//        },
+//        isFloatingActionButtonDocked = true,
+    )
 }
+
+@Composable
+fun TopBanner() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(MaterialTheme.colors.primary)
+            .fillMaxWidth()) {
+        Image(
+            painter = painterResource(R.drawable.ic_launcher_foreground),
+            contentDescription = "Logo",
+        )
+        Column {
+            Text("卓安保", fontSize = 24.sp)
+            Text("自动拦截恶意安装包", fontSize = 20.sp, color = MaterialTheme.colors.onPrimary)
+        }
+    }
+}
+
+@Composable
+fun MiddleDeclaration(hasAllPermissions: Boolean = false) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+        .background(MaterialTheme.colors.background)
+        .fillMaxWidth()) {
+        Column(modifier = Modifier
+            .padding(16.dp)
+            .wrapContentSize(Alignment.Center)) {
+            Text(
+                "❤️ 应用启动后会自动拦截恶意安装包，守护长者和孩童不受恶意应用骚扰",
+                fontSize = 18.sp,
+                lineHeight = 28.sp,
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colors.onBackground
+            )
+
+            // 根据权限状态动态显示
+            if (!hasAllPermissions)
+                Text(
+                    "⚠️ 请确保开启了应用的存储权限、开机启动权限、前台服务权限",
+                    fontSize = 18.sp,
+                    lineHeight = 28.sp,
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colors.onBackground
+                ) else Unit
+
+            // 根据版本号动态显示
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+                Text(
+                    "ℹ️️ 由于技术原因，Android 11 及以上版本拦截效果不佳，请了解",
+                    fontSize = 18.sp,
+                    lineHeight = 28.sp,
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colors.onBackground
+                ) else Unit
+
+            Divider(color = MaterialTheme.colors.onBackground, modifier = Modifier
+                .fillMaxWidth()
+                .width(1.dp))
+        }
+    }
+}
+
+@Composable
+fun BottomLog() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState())) {
+        repeat(16) {
+            Text(
+                "⛔️️ 2022:05:23 15:07:32 已拦截 /sd/com.ss.android.ugc.aweme/Download/qesw.apk.tp",
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                modifier = Modifier.padding(vertical = 6.dp),
+                color = MaterialTheme.colors.onBackground
+            )
+        }
+
+//        messages.forEach { message ->
+//            MessageRow(message)
+//        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     ApkAwayTheme {
-        Greeting("Android")
+        HomePage()
     }
 }

@@ -1,21 +1,28 @@
 package org.dinorss.apkaway.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = main,
+    primaryVariant = main,
+    onPrimary = Color(0xbbFFFFFF),
+
+    secondary = Color(0xFF2d2d2d),
+
+    background = Color(0xFF111111),
+    onBackground = Color(0xccFFFFFF),
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = main,
+    primaryVariant = main,
+    background = Color(0xFF111111)
 
     /* Other default colors to override
     background = Color.White,
@@ -32,7 +39,7 @@ fun ApkAwayTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
-        LightColorPalette
+        DarkColorPalette
     }
 
     MaterialTheme(
