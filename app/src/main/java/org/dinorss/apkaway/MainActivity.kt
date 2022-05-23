@@ -1,12 +1,5 @@
 package org.dinorss.apkaway
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import org.dinorss.apkaway.ui.theme.ApkAwayTheme
 import android.Manifest
 import android.app.ActivityManager
 import android.content.Context
@@ -14,24 +7,30 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.annotation.Nullable
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Phone
-import androidx.compose.material.icons.rounded.Refresh
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import org.dinorss.apkaway.ui.theme.ApkAwayTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,18 +67,18 @@ class MainActivity : ComponentActivity() {
         return false
     }
     private fun hasAllPermissions(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 return false
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (SDK_INT >= Build.VERSION_CODES.P) {
             if (ContextCompat.checkSelfPermission(applicationContext,
                     Manifest.permission.FOREGROUND_SERVICE) == PackageManager.PERMISSION_DENIED) {
                 return false
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(applicationContext,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
                 return false
@@ -100,20 +99,20 @@ class MainActivity : ComponentActivity() {
         // TODO 权限更新后，刷新页面
         checkPermission(Manifest.permission.RECEIVE_BOOT_COMPLETED, 0)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (SDK_INT >= Build.VERSION_CODES.M) {
             checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1)
             checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, 2)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (SDK_INT >= Build.VERSION_CODES.P) {
             checkPermission(Manifest.permission.FOREGROUND_SERVICE, 3)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                 intent.data = Uri.parse("package:" + applicationContext.packageName)
-                startActivity(intent)
+                startActivityForResult(intent, 4)
             }
         }
     }
@@ -139,6 +138,22 @@ class MainActivity : ComponentActivity() {
         if (hasAllPermissions()) {
             // 启动服务
             startService(Intent(this, ApkBlockerService::class.java))
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.d("PERM", "$requestCode $resultCode $data")
+        if (SDK_INT >= Build.VERSION_CODES.R) {
+            setContent {
+                ApkAwayTheme {
+                    HomePage(hasAllPermissions = hasAllPermissions())
+                }
+            }
+            if (hasAllPermissions()) {
+                // 启动服务
+                startService(Intent(this, ApkBlockerService::class.java))
+            }
         }
     }
 
@@ -225,7 +240,7 @@ fun MiddleDeclaration(hasAllPermissions: Boolean = false) {
                 ) else Unit
 
             // 根据版本号动态显示
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            if (SDK_INT >= Build.VERSION_CODES.R)
                 Text(
                     "ℹ️️ 由于技术原因，Android 11 及以上版本拦截效果不佳，请了解",
                     fontSize = 18.sp,
