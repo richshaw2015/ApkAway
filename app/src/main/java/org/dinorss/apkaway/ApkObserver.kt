@@ -7,6 +7,7 @@ import android.util.Log
 import java.io.File
 import java.io.FileNotFoundException
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -65,7 +66,7 @@ class RecursiveApkObserver:
             // 只监控特定的文件夹，避免影响性能
             if (file.name.lowercase().contains("download")
                 || OBSERVER_EXT_LIST.contains(file.absolutePath)) {
-                Log.d("", file.absolutePath)
+                // Log.d("", file.absolutePath)
                 return true
             }
             return false
@@ -101,7 +102,8 @@ class RecursiveApkObserver:
     }
 
     private fun notify(event: Int, file: File) {
-        val log = "⛔ ${LocalDateTime.now()} 已拦截 $file"
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val log = "⛔ ${LocalDateTime.now().format(formatter)} 已拦截 $file"
         MainActivity.BLOCK_LIST.add(0, log)
         if (MainActivity.BLOCK_LIST.size > LOG_MAX) {
             MainActivity.BLOCK_LIST = ArrayList(MainActivity.BLOCK_LIST.dropLast(1))
