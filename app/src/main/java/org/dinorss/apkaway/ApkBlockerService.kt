@@ -4,13 +4,9 @@ import android.app.*
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 
 class ApkBlockerService : Service() {
 
@@ -20,7 +16,7 @@ class ApkBlockerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action != null && intent.action.equals(
-                MainActivity.ACTION_STOP_FOREGROUND, ignoreCase = true)) {
+                MainActivity.ACTION_STOP_SERVICE, ignoreCase = true)) {
             stopForeground(true)
             stopSelf()
         }

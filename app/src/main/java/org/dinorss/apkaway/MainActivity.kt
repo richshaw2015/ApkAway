@@ -12,19 +12,23 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.Nullable
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -36,18 +40,29 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 界面逻辑
-        setContent {
-            ApkAwayTheme {
-                HomePage(hasAllPermissions = hasAllPermissions())
-            }
-        }
-
         // 检查权限
         checkAllPermissions()
+    }
 
+    override fun onResume() {
+        super.onResume()
+
+        // 刷新界面
+        setContent {
+            ApkAwayTheme {
+                HomePage(hasAllPermissions = hasAllPermissions(), logs= BLOCK_LIST)
+            }
+        }
         if (hasAllPermissions()) {
             // 启动服务
+            startService(Intent(this, ApkBlockerService::class.java))
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (hasAllPermissions()) {
+            // 启动服务，有些手机服务需要启动两次才生效
             startService(Intent(this, ApkBlockerService::class.java))
         }
     }
@@ -96,7 +111,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun checkAllPermissions() {
-        // TODO 权限更新后，刷新页面
         checkPermission(Manifest.permission.RECEIVE_BOOT_COMPLETED, 0)
 
         if (SDK_INT >= Build.VERSION_CODES.M) {
@@ -132,7 +146,7 @@ class MainActivity : ComponentActivity() {
         // 权限更新
         setContent {
             ApkAwayTheme {
-                HomePage(hasAllPermissions = hasAllPermissions())
+                HomePage(hasAllPermissions = hasAllPermissions(), logs= BLOCK_LIST)
             }
         }
         if (hasAllPermissions()) {
@@ -147,7 +161,7 @@ class MainActivity : ComponentActivity() {
         if (SDK_INT >= Build.VERSION_CODES.R) {
             setContent {
                 ApkAwayTheme {
-                    HomePage(hasAllPermissions = hasAllPermissions())
+                    HomePage(hasAllPermissions = hasAllPermissions(), logs= BLOCK_LIST)
                 }
             }
             if (hasAllPermissions()) {
@@ -158,17 +172,19 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object{
-        const val  ACTION_STOP_FOREGROUND = "${BuildConfig.APPLICATION_ID}.stopforeground"
+        const val  ACTION_STOP_SERVICE = "${BuildConfig.APPLICATION_ID}.stopservice"
+        // 拦截记录
+        var BLOCK_LIST  = arrayListOf<String>()
     }
 }
 
 @Composable
-fun HomePage(hasAllPermissions: Boolean = false) {
+fun HomePage(hasAllPermissions: Boolean = false, logs: List<String>) {
     Scaffold(
         content = { Column() {
             TopBanner(hasAllPermissions = hasAllPermissions)
             MiddleDeclaration(hasAllPermissions = hasAllPermissions)
-            BottomLog()
+            BottomLog(logs = logs)
         } },
 //        bottomBar = {
 //            BottomAppBar(
@@ -206,7 +222,7 @@ fun TopBanner(hasAllPermissions: Boolean = false) {
         )
         Column {
             Text("卓安保･" + (if (hasAllPermissions) "守护中" else "服务未启动"), fontSize = 24.sp)
-            Text("自动拦截恶意安装包", fontSize = 20.sp, color = MaterialTheme.colors.onPrimary)
+            Text("自动拦截恶意安装包", fontSize = 18.sp, color = MaterialTheme.colors.onPrimary)
         }
     }
 }
@@ -258,33 +274,19 @@ fun MiddleDeclaration(hasAllPermissions: Boolean = false) {
 }
 
 @Composable
-fun BottomLog() {
+fun BottomLog(logs : List<String>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())) {
-        repeat(16) {
-            Text(
-                "⛔️️ 2022:05:23 15:07:32 已拦截 /sd/com.ss.android.ugc.aweme/Download/qesw.apk.tp",
+        logs.forEach { log ->
+            Text(log,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 modifier = Modifier.padding(vertical = 6.dp),
                 color = MaterialTheme.colors.onBackground
             )
         }
-
-//        messages.forEach { message ->
-//            MessageRow(message)
-//        }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ApkAwayTheme {
-        HomePage()
     }
 }

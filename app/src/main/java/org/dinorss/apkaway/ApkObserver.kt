@@ -5,6 +5,8 @@ import android.os.FileObserver
 import android.os.Looper
 import android.util.Log
 import java.io.File
+import java.io.FileNotFoundException
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -17,6 +19,8 @@ const val RESET_MAX = 20
 const val RESET_TIMER_MS = 1000.0
 const val RESET_TIMER_INTERVAL = 50.0
 
+// 日志最大数量
+const val LOG_MAX = 100
 
 class RecursiveApkObserver:
     FileObserver(SDCARD_DATA_ROOT, CREATE) {
@@ -97,14 +101,19 @@ class RecursiveApkObserver:
     }
 
     private fun notify(event: Int, file: File) {
-        Log.i("Notify $event", file.toString())
+        val log = "⛔ ${LocalDateTime.now()} 已拦截 $file"
+        MainActivity.BLOCK_LIST.add(0, log)
+        if (MainActivity.BLOCK_LIST.size > LOG_MAX) {
+            MainActivity.BLOCK_LIST = ArrayList(MainActivity.BLOCK_LIST.dropLast(1))
+        }
+
+        Log.i("$event", log)
 
         // 只清理 apk 文件
         if (file.name.contains(".apk")) {
             // 先立刻清理
             for (i in 1..RESET_MAX) {
                 file.writeText("")
-                Log.w("Reset", "$i")
             }
 
             // 继续用定时器定时清理
@@ -114,8 +123,12 @@ class RecursiveApkObserver:
                 val timer = object: CountDownTimer(RESET_TIMER_MS.toLong(),
                     RESET_TIMER_INTERVAL.toLong()) {
                     override fun onTick(ms: Long) {
-                        file.writeText("")
-                        Log.w("Reset", "$ms")
+                        try {
+                            file.writeText("")
+                        } catch (e: FileNotFoundException) {
+                            Log.d("onTick", e.toString())
+                        }
+
                     }
                     override fun onFinish() {}
                 }
