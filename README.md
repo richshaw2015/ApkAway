@@ -2,9 +2,12 @@
 
 # 小卓守护——自动拦截恶意安装包
 
+## 介绍
+
 - ❤️ 小卓启动后会自动拦截恶意安装包，守护长者和儿童不受恶意应用骚扰
 - ⚠️ 请确保开启了应用的存储权限、开机启动权限、前台服务权限
 - ℹ️️ 由于技术原因，Android 11 及以上版本拦截效果不佳
+
 
 <img width="360px" src="https://raw.githubusercontent.com/richshaw2015/ApkAway/master/src/screenshot.jpg">
 
