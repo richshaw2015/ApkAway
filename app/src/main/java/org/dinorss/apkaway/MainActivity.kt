@@ -180,8 +180,6 @@ class MainActivity : ComponentActivity() {
 
     companion object{
         const val  ACTION_STOP_SERVICE = "${BuildConfig.APPLICATION_ID}.stopservice"
-        // 拦截记录
-        var BLOCK_LIST  = arrayListOf<String>()
     }
 }
 
@@ -237,17 +235,15 @@ fun MiddleDeclaration(hasAllPermissions: Boolean = false) {
                 modifier = Modifier.padding(vertical = 8.dp),
                 color = MaterialTheme.colors.onBackground
             )
-
             // 根据权限状态动态显示
-            if (!hasAllPermissions)
-                Text(
-                    "⚠️ 请确保开启了应用的存储权限、开机启动权限、前台服务权限",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 28.sp,
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    color = MaterialTheme.colors.onBackground
-                ) else Unit
+            Text(
+                "⚠️ 请确保开启了应用的存储权限、开机启动权限、前台服务权限",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 28.sp,
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colors.onBackground
+            )
 
             // 根据版本号动态显示
             if (SDK_INT >= Build.VERSION_CODES.R)

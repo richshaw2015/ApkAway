@@ -23,6 +23,9 @@ const val RESET_TIMER_INTERVAL = 50.0
 // 日志最大数量
 const val LOG_MAX = 100
 
+// 拦截记录
+var BLOCK_LIST  = arrayListOf<String>()
+
 class RecursiveApkObserver:
     FileObserver(SDCARD_DATA_ROOT, CREATE) {
     private val mObservers: MutableMap<String, FileObserver?> = HashMap()
@@ -103,10 +106,10 @@ class RecursiveApkObserver:
 
     private fun notify(event: Int, file: File) {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val log = "⛔ ${LocalDateTime.now().format(formatter)} 已拦截 $file"
-        MainActivity.BLOCK_LIST.add(0, log)
-        if (MainActivity.BLOCK_LIST.size > LOG_MAX) {
-            MainActivity.BLOCK_LIST = ArrayList(MainActivity.BLOCK_LIST.dropLast(1))
+        val log = "⛔ ${LocalDateTime.now().format(formatter)} 已拦截安装包 $file"
+        BLOCK_LIST.add(0, log)
+        if (BLOCK_LIST.size > LOG_MAX) {
+            BLOCK_LIST = ArrayList(BLOCK_LIST.dropLast(1))
         }
 
         Log.i("$event", log)
