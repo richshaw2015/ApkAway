@@ -1,5 +1,7 @@
 package org.dinorss.apkaway
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -9,8 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -18,6 +22,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -79,9 +84,9 @@ fun TopBanner(hasAllPermissions: Boolean = false, bottomState: BottomSheetScaffo
 fun MiddleDeclaration() {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
         .background(MaterialTheme.colors.background)
+        .padding(top = 8.dp, start = 16.dp, end = 16.dp)
         .fillMaxWidth()) {
         Column(modifier = Modifier
-            .padding(16.dp)
             .wrapContentSize(Alignment.Center)) {
             Text(
                 "❤️ 小卓启动后会自动拦截恶意安装包，守护长者和儿童不受恶意应用骚扰",
@@ -114,6 +119,7 @@ fun MiddleDeclaration() {
 
             Divider(color = MaterialTheme.colors.onBackground, modifier = Modifier
                 .fillMaxWidth()
+                .padding(vertical = 8.dp)
                 .width(1.dp))
         }
     }
@@ -136,7 +142,7 @@ fun BottomLogs(logs : List<String>) {
                 )
             }
         } else {
-            Text("⛔ 拦截日志将在这里显示",
+            Text("⛔ 拦截信息将在这里显示",
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 modifier = Modifier.padding(vertical = 6.dp),
@@ -164,6 +170,7 @@ fun BottomLottie() {
 @Composable
 fun HelpPage(bottomState: BottomSheetScaffoldState) {
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -173,11 +180,13 @@ fun HelpPage(bottomState: BottomSheetScaffoldState) {
             .verticalScroll(rememberScrollState())) {
 
         Row(
-            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text("关于小卓守护", fontSize = 22.sp)
-            Text("❌", fontSize = 22.sp, modifier = Modifier.clickable {
+            Text("❌", fontSize = 20.sp, modifier = Modifier.clickable {
                 coroutineScope.launch { bottomState.bottomSheetState.collapse() }
             })
         }
@@ -230,7 +239,7 @@ fun HelpPage(bottomState: BottomSheetScaffoldState) {
             color = MaterialTheme.colors.onBackground
         )
         Text(
-            "关闭“安装未知应用”权限有一些帮助；\nROOT 手机是最彻底的；\n更换 iPhone 是最简单的；",
+            "关闭“安装未知应用”权限有一些帮助；ROOT 手机是最彻底的；更换 iPhone 是最简单的；",
             fontSize = 16.sp,
             lineHeight = 28.sp,
             modifier = Modifier.padding(vertical = 4.dp),
@@ -249,7 +258,16 @@ fun HelpPage(bottomState: BottomSheetScaffoldState) {
             "如果小卓帮助到了您的家人，或者拦截没有生效，或者有更好的想法，都欢迎在 GitHub 上交流。",
             fontSize = 16.sp,
             lineHeight = 28.sp,
-            modifier = Modifier.padding(vertical = 4.dp),
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .clickable {
+                    val browserIntent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/richshaw2015/ApkAway")
+                    )
+                    context.startActivity(browserIntent)
+                },
             color = MaterialTheme.colors.onBackground
         )
     }
