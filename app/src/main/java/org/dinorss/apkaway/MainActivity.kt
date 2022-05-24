@@ -45,11 +45,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (SDK_INT >= Build.VERSION_CODES.R) {
-            if (hasAllPermissions()) {
-                // 启动服务，有些手机服务需要启动两次才生效
-                startService(Intent(this, ApkBlockerService::class.java))
-            }
+
+        if (hasAllPermissions()) {
+            // 启动服务，有些手机服务需要启动两次才生效
+            startService(Intent(this, ApkBlockerService::class.java))
         }
     }
 
