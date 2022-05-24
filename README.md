@@ -6,6 +6,8 @@
 - ⚠️ 请确保开启了应用的存储权限、开机启动权限、前台服务权限
 - ℹ️️ 由于技术原因，Android 11 及以上版本拦截效果不佳
 
+![ScreenShot](https://raw.githubusercontent.com/richshaw2015/ApkAway/master/src/screenshot.jpg)
+
 ## FAQ
 
 ### ❓️ 小卓是怎么诞生的
